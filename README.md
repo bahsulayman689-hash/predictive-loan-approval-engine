@@ -9,7 +9,7 @@ An end-to-end FinTech Machine Learning web application designed to automate cred
 ---
 
 ## 🚀 Live Production Demo
-🔗 **Interact with the deployed live application here:** *[INSERT YOUR STREAMLIT SHARE LINK HERE]*
+🔗 **Interact with the deployed live application here:** *[https://predictive-loan-approval-engine-bah.streamlit.app/]*
 
 ---
 
