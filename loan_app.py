@@ -43,8 +43,8 @@ st.markdown(
 @st.cache_resource
 def load_assets():
     if os.path.exists("finance_loan_model.pkl") and os.path.exists("finance_scaler.pkl"):
-        model = joblib.load("finance_loan_model.pkl")
-        scaler = joblib.load("finance_scaler.pkl")
+        model = joblib.load("finance_loan_models.pkl")
+        scaler = joblib.load("finance_scalers.pkl")
         return model, scaler
     return None, None
 
