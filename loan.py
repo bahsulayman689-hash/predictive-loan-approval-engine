@@ -68,4 +68,4 @@ model.fit(X_train_scaled, y_train)
 joblib.dump(model, "finance_loan_models.pkl")
 joblib.dump(scaler, "finance_scalers.pkl")
 
-print("✅ Success: New strict models saved as 'finance_loan_model.pkl' & 'finance_scaler.pkl'!")
+print("✅ Success: New strict models saved as 'finance_loan_models.pkl' & 'finance_scalers.pkl'!")
