@@ -65,7 +65,7 @@ model = RandomForestClassifier(n_estimators=100, random_state=42)
 model.fit(X_train_scaled, y_train)
 
 # 5. Serialize Weights Matrix Files securely to Disk
-joblib.dump(model, "finance_loan_model.pkl")
-joblib.dump(scaler, "finance_scaler.pkl")
+joblib.dump(model, "finance_loan_models.pkl")
+joblib.dump(scaler, "finance_scalers.pkl")
 
 print("✅ Success: New strict models saved as 'finance_loan_model.pkl' & 'finance_scaler.pkl'!")
