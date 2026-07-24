@@ -113,20 +113,44 @@ else:
             st.error("⚠️ **CRITERIA BLOCKED: APPLICANT HIGH RISK** — Credit score parameters, debt ratios, or asset evaluations indicate a higher probability of credit default.")
 
 # --- Sidebar Branded Footprints ---
+  
+        # New Feature: Live Calculation Analysis Expander
+        with st.expander("🔍 View Risk Engine Calculations"):
+            st.write(f"📊 **Monthly Disposable Income:** {income_annum / 12:,.2f} GMD")
+            st.write(f"💳 **Estimated Monthly Payment:** {loan_amount / loan_term:,.2f} GMD")
+            st.write(f"🏡 **Total Collateral Portfolio Value:** {residential_assets_value + commercial_assets_value + luxury_assets_value + bank_asset_value:,.2f} GMD")
+
+# --- Sidebar Branded Footprints ---
 with st.sidebar:
     st.header("🛡️ FinTech RiskHub")
     st.write("This standalone interface acts as a decision support utility tailored for local credit unions and MFI networks.")
     st.markdown("---")
     
+    # 1. New Feature: Help Guide Expander
+    with st.sidebar.expander("💡 Input Help Guide"):
+        st.write("**CIBIL Score:** Scores below 550 represent severe credit default risk and will trigger an automatic system rejection.")
+        st.write("**Dependents:** High dependent footprints directly restrict monthly repayment capacities.")
+        st.write("**Asset Cover:** The requested loan total must be backed by healthy collateral valuations to safeguard capital.")
+        
+    # 2. New Feature: Model Architecture Expander
+    with st.sidebar.expander("⚙️ Model Architecture Details"):
+        st.write("**Core Algorithm:** Random Forest Classifier")
+        st.write("**Tree Estimators:** 100 Decision Trees")
+        st.write("**Data Scaler:** Scikit-Learn StandardScaler")
+        st.write("**Inference Engine:** Serialized Weight Arrays via Joblib")
+
+    st.markdown("---")
     st.subheader("👨‍💻 Application Architect")
     if os.path.exists("IMG-20260704-WA0633.jpg"):
         st.image("IMG-20260704-WA0633.jpg", caption="Sulayman Bah", width=180)
+    else:
+        st.info("💡 Profile image asset not found.")
         
     st.write("**Lead Engineer:** Sulayman Bah")
     st.write("**Specialization:** Predictive Financial Risk System Integrations")
     st.markdown("---")
     
     st.subheader("🔗 System Portals")
-    st.markdown("[📁 Core Portfolio GitHub](https://github.com/bahsulayman689-hash)")
-    st.markdown("[💼 Business Network LinkedIn](www.linkedin.com/in/sulayman-bah-8a7096423)")
+    st.markdown("[📁 GitHub Profile](https://github.com/bahsulayman689-hash)")
+    st.markdown("[💼 LinkedIn Profile](www.linkedin.com/in/sulayman-bah-8a7096423)")
     st.markdown("[📧 Email Support](mailto:bahsulayman689@gmail.com)")
