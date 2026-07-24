@@ -26,11 +26,29 @@ data = {
 
 df = pd.DataFrame(data)
 
-# Inject logical financial rules for the targets to mimic Kaggle
-# High CIBIL score + high assets = approved (1), otherwise default risk (0)
-score_metric = (df['cibil_score'] * 3) + (df['income_annum'] / 10000) + (df['bank_asset_value'] / 10000)
-loan_metric = (df['loan_amount'] / 5000)
-df['loan_status'] = np.where(score_metric > loan_metric, 1, 0)
+# --- NEW STRICT FINTECH UNDERWRITING MATRIX ---
+# 1. Calculate Monthly Disposable Capacity
+monthly_income = df['income_annum'] / 12
+estimated_monthly_payment = df['loan_amount'] / df['loan_term']
+
+# 2. Total Net Asset Cover Value
+total_assets = (df['residential_assets_value'] + 
+                df['commercial_assets_value'] + 
+                df['luxury_assets_value'] + 
+                df['bank_asset_value'])
+
+# 3. Apply Multi-Layer Sanction Rules to find defaults
+# Rule A: Default risk if requested loan amount is higher than total asset backing
+fail_asset_cover = df['loan_amount'] > total_assets
+
+# Rule B: Default risk if monthly payment takes up more than 50% of monthly income
+fail_debt_ratio = estimated_monthly_payment > (monthly_income * 0.5)
+
+# Rule C: Default risk if credit score is deeply subprime (under 550)
+fail_credit = df['cibil_score'] < 550
+
+# Target is Approved (1) ONLY if they pass ALL clinical risk hurdles. Otherwise Default (0)
+df['loan_status'] = np.where(fail_asset_cover | fail_debt_ratio | fail_credit, 0, 1)
 
 # 2. Split Features & Targets
 X = df.drop(columns=['loan_status'])
@@ -50,4 +68,4 @@ model.fit(X_train_scaled, y_train)
 joblib.dump(model, "finance_loan_model.pkl")
 joblib.dump(scaler, "finance_scaler.pkl")
 
-print("✅ Success: 'finance_loan_model.pkl' & 'finance_scaler.pkl' have been saved successfully!")
+print("✅ Success: New strict models saved as 'finance_loan_model.pkl' & 'finance_scaler.pkl'!")
