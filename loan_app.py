@@ -220,12 +220,25 @@ with header_col2:
 st.markdown("---")
 st.markdown("### 📤 Bulk Credit Assessment (CSV Upload)")
 uploaded_file = st.file_uploader("Upload Batch Applications CSV", type=["csv"])
-
+# Match these exactly to the columns used when training your model (e.g., in pandas X.columns)
+FEATURE_NAMES = [
+    "no_of_dependents",
+    "education",
+    "self_employed",
+    "income_annum",
+    "loan_amount",
+    "loan_term",
+    "cibil_score",
+    "residential_assets_value",
+    "commercial_assets_value",
+    "luxury_assets_value",
+    "bank_asset_value"
+]
 if uploaded_file is not None:
     batch_df = pd.read_csv(uploaded_file)
     if st.button("Run Batch Assessment"):
         # Scale and predict
-        batch_scaled = scaler.transform(batch_df[feature_names])
+        batch_scaled = scaler.transform(batch_df[FEATURE_NAMES])
         batch_df['Loan_Status'] = ["Approved" if p == 1 else "Rejected" for p in model.predict(batch_scaled)]
         
         st.write("### Batch Assessment Results", batch_df)
@@ -410,13 +423,19 @@ else:
 
 
         # 4. Safely Process Signature Image
+        # 4. Safely Process Signature Image
         sig_bytes = None
-        if canvas_result.image_data is not None and np.any(canvas_result.image_data[:, :, 3] > 0):
-            img = Image.fromarray(canvas_result.image_data.astype('uint8'), 'RGBA')
-            sig_buffer = io.BytesIO()
-            img.save(sig_buffer, format='PNG')
-            sig_buffer.seek(0)
-            sig_bytes = sig_buffer
+        try:
+            if canvas_result is not None and canvas_result.image_data is not None:
+                if np.any(canvas_result.image_data[:, :, 3] > 0):
+                    img = Image.fromarray(canvas_result.image_data.astype('uint8'), 'RGBA')
+                    sig_buffer = io.BytesIO()
+                    img.save(sig_buffer, format='PNG')
+                    sig_buffer.seek(0)
+                    sig_bytes = sig_buffer
+        except (AttributeError, RuntimeError, TypeError):
+            # Canvas was left empty or failed to initialize properly; proceed without signature
+            sig_bytes = None
 
         # 5. PDF Document Download
         pdf_buffer = generate_decision_pdf(
