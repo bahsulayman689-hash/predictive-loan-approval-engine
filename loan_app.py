@@ -21,6 +21,8 @@ from reportlab.platypus import HRFlowable, Image as RLImage, Paragraph, SimpleDo
 from streamlit_drawable_canvas import st_canvas
 import plotly.graph_objects as go
 
+import features  # NEW: add-on features (policy checks, risk grade, repayments, dashboard, backup...)
+
 LOAN_RECORDS_CSV = "loan_records.csv"
 
 # --- STREAMLIT PAGE CONFIGURATION ---
@@ -331,7 +333,7 @@ else:
             commercial_assets_value, luxury_assets_value, bank_asset_value
         ]])
 
-        input_scaled = scaler.transform(input_data)
+        input_scaled = scaler.transform(features.to_model_units(input_data))  # NEW: model expects loan_term in YEARS
         prediction = model.predict(input_scaled)
         
         # Risk Metrics
@@ -502,6 +504,15 @@ else:
                 f"**Stressed Loan-to-Asset:** {stressed_lta:.1f}%"
             )    
 
+        # NEW: extra panels (probability, risk grade, policy check, max loan, tips, WhatsApp, agreement PDF)
+        features.render_evaluation_extras(
+            model=model, scaler=scaler, input_data=input_data, status=status, loan_id=loan_id,
+            applicant_name=display_name, applicant_phone=display_phone,
+            loan_amount=loan_amount, loan_term=loan_term, interest_rate=interest_rate,
+            income_annum=income_annum, cibil_score=cibil_score, total_assets=total_assets,
+            monthly_pay=monthly_payment, officer_name=officer_name, branch_name=branch_name
+        )
+
         # 7. CLEAN TRANSACTION SAVING (Auto-Resets Old Non-Matching Files)
         # 7. CLEAN TRANSACTION SAVING (Extended Risk & Financial Metrics)
         record = {
@@ -546,8 +557,15 @@ else:
             quoting=csv.QUOTE_ALL
         )
 
-        send_loan_status_email(display_email, display_name, status, loan_id, loan_amount)
-        dispatch_sms_alert(display_phone, display_name, status, loan_id)
+        # NEW: really send the decision to the applicant - email (decision letter PDF attached) + SMS
+        features.notify_applicant(
+            name=display_name, phone=display_phone, email=display_email, loan_id=loan_id, status=status,
+            loan_amount=loan_amount, loan_term=loan_term, interest_rate=interest_rate,
+            pdf_bytes=pdf_buffer.getvalue()
+        )
+
+# NEW: dashboard, disbursements & repayments, loan lookup, backup & restore
+features.render_extra_sections()
 
 # --- SIDEBAR AUDIT LOG ---
 # --- ENHANCED SIDEBAR AUDIT & EXECUTIVE ANALYTICS ---
@@ -680,3 +698,7 @@ with st.sidebar:
         st.markdown("[📁 GitHub Profile](https://github.com/bahsulayman689-hash)")
         st.markdown("[💼 LinkedIn Profile](https://www.linkedin.com/in/sulayman-bah-8a7096423)")
         st.markdown("[📧 Email Support](mailto:bahsulayman689@gmail.com)")
+
+# NEW: lending policy limits + SMS/institution options in the sidebar
+with st.sidebar:
+    features.sidebar_policy_settings()
