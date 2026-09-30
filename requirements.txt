@@ -11,3 +11,4 @@ streamlit-drawable-canvas==0.9.3
 supabase>=2.4
 openpyxl
 requests
+matplotlib
